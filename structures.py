@@ -57,6 +57,20 @@ class Vector:
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
 
 
+class Plane:
+    def __init__(self, a, b, c, d):
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
+
+    def __str__(self) -> str:
+        return str(self.a) +'*x + ' + str(self.b) + '*y + ' + str(self.c) + '*z + ' + str(self.d)
+
+    def normal(self) -> Vector:
+        return Vector(self.a, self.b, self.c)
+
+
 def generate_vector(A: Point, B: Point) -> Vector:
     v = Vector(B.x-A.x, B.y-A.y, B.z-A.z)
     return v
@@ -91,3 +105,26 @@ def volume_of_parallelepiped(a: Vector, b: Vector, c: Vector) -> float:
 
 def volume_of_pyramid(a: Vector, b: Vector, c: Vector) -> float:
     return volume_of_parallelepiped(a, b, c) / 6
+
+def generate_plane_via_points(A: Point, B: Point, C: Point) -> Plane:
+    v1 = generate_vector(A, B)
+    v2 = generate_vector(A, C)
+    n_alpha = cross_vectors(v1, v2)
+    d = -(n_alpha.x * A.x + n_alpha.y * A.y + n_alpha.z * A.z)
+    if d > 0:
+        n_alpha = -n_alpha
+        d = -d
+    return Plane(n_alpha.x, n_alpha.y, n_alpha.z, d)
+
+
+def angle_between_vector_and_plane(alpha: Plane, v: Vector) -> float:
+    n = alpha.normal()
+    return abs(90 - angle_between_vectors(n, v))
+
+def angle_between_planes(alpha: Plane, beta: Plane) -> float:
+    n1 = alpha.normal()
+    n2 = beta.normal()
+    return angle_between_vectors(n1, n2)
+
+def dist_point_plane(A: Point, alpha: Plane) -> float:
+    return abs(alpha.a * A.x + alpha.b * A.y + alpha.c * A.z + alpha.d)/(alpha.normal().length())
