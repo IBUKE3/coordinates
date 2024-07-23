@@ -7,6 +7,9 @@ class Point:
         self.y = y
         self.z = z
 
+    def __str__(self):
+        return str([self.x, self.y, self.z])
+
     def __add__(self, other):
         if not isinstance(other, Point):
             raise ArithmeticError('The second object is not a Point')
@@ -57,6 +60,18 @@ class Vector:
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
 
 
+class Line:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __str__(self):
+        return str([self.a, self.b])
+
+    def dir_vector(self):
+        return generate_vector(self.a, self.b)
+
+
 class Plane:
     def __init__(self, a, b, c, d):
         self.a = a
@@ -91,7 +106,7 @@ def angle_between_vectors(a: Vector, b: Vector) -> float:
 def cross_vectors(a: Vector, b: Vector) -> Vector:
     x = a.y * b.z - a.z * b.y
     y = a.z * b.x - a.x * b.z
-    z = a.z * b.y - a.y * b.x
+    z = a.x * b.y - a.y * b.x
     return Vector(x, y, z)
 
 
@@ -128,3 +143,14 @@ def angle_between_planes(alpha: Plane, beta: Plane) -> float:
 
 def dist_point_plane(A: Point, alpha: Plane) -> float:
     return abs(alpha.a * A.x + alpha.b * A.y + alpha.c * A.z + alpha.d)/(alpha.normal().length())
+
+def dist_point_line(A: Point, l: Line) -> float:
+    s = l.dir_vector()
+    r = generate_vector(l.a, A)
+    return cross_vectors(s, r).length() / s.length()
+
+def dist_line_line(l1: Line, l2: Line) -> float:
+    s1 = l1.dir_vector()
+    s2 = l2.dir_vector()
+    r = generate_vector(l1.a, l2.a)
+    return abs(mixed_vectors(s1, s2, r)) / cross_vectors(s1, s2).length()
